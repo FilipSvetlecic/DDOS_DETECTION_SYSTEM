@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Minimal dependencies — just HTTP client libs
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY scripts/ ./scripts/
+
+# CLIENT_SCRIPT is set per-container in docker-compose.yml
+# e.g. scripts/normal_client.py or scripts/ddos_client.py
+CMD ["sh", "-c", "python ${CLIENT_SCRIPT}"]

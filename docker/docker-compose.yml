@@ -1,0 +1,75 @@
+networks:
+  ddos_net:
+    driver: bridge
+
+services:
+
+  # ── Server (1 container) ────────────────────────────────────────────────────
+  server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.server
+    container_name: server
+    ports:
+      - "8000:8000"        # expose to host so you can curl from your terminal
+    networks:
+      - ddos_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Normal clients (2 containers) ──────────────────────────────────────────
+  normal_client_1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.client
+    container_name: normal_client_1
+    environment:
+      - CLIENT_SCRIPT=scripts/normal_client.py
+    networks:
+      - ddos_net
+    depends_on:
+      server:
+        condition: service_healthy
+
+  normal_client_2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.client
+    container_name: normal_client_2
+    environment:
+      - CLIENT_SCRIPT=scripts/normal_client.py
+    networks:
+      - ddos_net
+    depends_on:
+      server:
+        condition: service_healthy
+
+  # ── DDoS attackers (2 containers) ──────────────────────────────────────────
+  ddos_client_1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.client
+    container_name: ddos_client_1
+    environment:
+      - CLIENT_SCRIPT=scripts/ddos_client.py
+    networks:
+      - ddos_net
+    depends_on:
+      server:
+        condition: service_healthy
+
+  ddos_client_2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.client
+    container_name: ddos_client_2
+    environment:
+      - CLIENT_SCRIPT=scripts/ddos_client.py
+    networks:
+      - ddos_net
+    depends_on:
+      server:
+        condition: service_healthy
