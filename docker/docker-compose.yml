@@ -4,14 +4,13 @@ networks:
 
 services:
 
-  # ── Server (1 container) ────────────────────────────────────────────────────
   server:
     build:
       context: ..
       dockerfile: docker/Dockerfile.server
     container_name: server
     ports:
-      - "8000:8000"        # expose to host so you can curl from your terminal
+      - "8000:8000"
     networks:
       - ddos_net
     healthcheck:
@@ -20,7 +19,6 @@ services:
       timeout: 5s
       retries: 3
 
-  # ── Normal clients (2 containers) ──────────────────────────────────────────
   normal_client_1:
     build:
       context: ..
@@ -47,7 +45,6 @@ services:
       server:
         condition: service_healthy
 
-  # ── DDoS attackers (2 containers) ──────────────────────────────────────────
   ddos_client_1:
     build:
       context: ..
