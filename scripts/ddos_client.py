@@ -21,10 +21,7 @@ log = logging.getLogger(__name__)
 
 SERVER  = "http://server:8000"
 THREADS = 5
-BATCH_LOG = 50
-
-_count_lock = threading.Lock()
-_req_count  = 0
+BATCH_LOG = 10
 
 
 def sample_ddos() -> dict:
@@ -39,11 +36,10 @@ def sample_ddos() -> dict:
     - SYN flags: almost never set (this is UDP/HTTP flood, not SYN flood)
     - ACK flags: more commonly set than BENIGN
     """
-    # avg_packet_size is bimodal in DDoS: tiny packets OR large packets
     if random.random() < 0.5:
-        avg_packet_size = random.uniform(7.2, 8.0)    # tiny flood packets
+        avg_packet_size = random.uniform(7.2, 8.0)
     else:
-        avg_packet_size = random.uniform(897.0, 1661.0)  # large payload floods
+        avg_packet_size = random.uniform(897.0, 1661.0)
 
     return {
         # Flow Duration: medium-to-long flows (µs)
@@ -70,7 +66,7 @@ def sample_ddos() -> dict:
 
 
 def flood(thread_id: int):
-    global _req_count
+    req_count = 0
     session = requests.Session()
 
     while True:
@@ -83,15 +79,14 @@ def flood(thread_id: int):
                 timeout=2,
             )
             data = resp.json()
-
-            with _count_lock:
-                _req_count += 1
-                if _req_count % BATCH_LOG == 0:
-                    log.info(
-                        "Thread %d | total: %d | last: %s (%.4f)",
-                        thread_id, _req_count,
-                        data["label"], data["confidence"]
-                    )
+            req_count +=1
+            if req_count % BATCH_LOG == 0:
+                log.info(
+                "Thread %d | total: %d",
+                thread_id, req_count,
+            )
+            
+            
 
         except requests.exceptions.ConnectionError:
             log.warning("Thread %d — server unreachable, retrying...", thread_id)

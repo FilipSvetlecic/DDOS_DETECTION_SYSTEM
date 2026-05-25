@@ -64,14 +64,13 @@ def run():
             )
             data = resp.json()
             log.info("Sent BENIGN sample → server says: %s (%.4f)",
-                     data["label"], data["confidence"])
+                    data["label"], data["confidence"])
 
         except requests.exceptions.ConnectionError:
             log.warning("Server unreachable, retrying in 3s...")
             time.sleep(3)
             continue
 
-        # Normal user: 1 request every 1-3 seconds
         time.sleep(random.uniform(1.0, 3.0))
 
 

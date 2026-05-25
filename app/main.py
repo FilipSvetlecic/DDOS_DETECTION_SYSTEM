@@ -23,24 +23,16 @@ app = FastAPI(title="DDoS Detection API")
 
 
 class FlowFeatures(BaseModel):
-    flow_duration:      float
-    total_fwd_packets:  int
-    flow_bytes_s:       float
-    flow_pkts_s:        float
-    avg_packet_size:    float
-    syn_flag_count:     int
-    ack_flag_count:     int
-
-    @field_validator("flow_duration", "flow_bytes_s", "flow_pkts_s", "avg_packet_size")
-    @classmethod
-    def must_be_finite(cls, v):
-        if not math.isfinite(v):
-            raise ValueError("Feature value must be finite")
-        return v
-
+    flow_duration: float
+    total_fwd_packets: int
+    flow_bytes_s: float
+    flow_pkts_s: float
+    avg_packet_size: float
+    syn_flag_count: int
+    ack_flag_count: int
 
 class PredictionResult(BaseModel):
-    label:      str
+    label: str
     confidence: float
 
 

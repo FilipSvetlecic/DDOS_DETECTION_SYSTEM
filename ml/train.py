@@ -65,8 +65,8 @@ def evaluate(clf, X_test, y_test):
         target_names=["BENIGN (0)", "DDoS (1)"],
         digits=4,
     )
-    cm      = confusion_matrix(y_test, y_pred)
-    auc     = roc_auc_score(y_test, y_proba)
+    cm = confusion_matrix(y_test, y_pred)
+    auc = roc_auc_score(y_test, y_proba)
  
     # Feature importances ranked highest to lowest
     importances = sorted(

@@ -10,11 +10,11 @@ from pathlib import Path
 import joblib
 import math
 
-ROOT      = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent
 MODEL_DIR = ROOT / "ml"
 
 SCALER_PATH = MODEL_DIR / "scaler.joblib"
-MODEL_PATH  = MODEL_DIR / "model.joblib"
+MODEL_PATH = MODEL_DIR / "model.joblib"
 
 FEATURE_NAMES = [
     "flow_duration",
@@ -28,7 +28,7 @@ FEATURE_NAMES = [
 
 # Loaded once when the module is imported — not on every request
 scaler = joblib.load(SCALER_PATH)
-model  = joblib.load(MODEL_PATH)
+model = joblib.load(MODEL_PATH)
 
 
 def predict(features: dict) -> dict:
@@ -40,12 +40,12 @@ def predict(features: dict) -> dict:
         if not math.isfinite(features.get(k, 0.0)):
             features[k] = 0.0
 
-    df        = pd.DataFrame([features], columns=FEATURE_NAMES)
+    df = pd.DataFrame([features], columns=FEATURE_NAMES)
     df_scaled = pd.DataFrame(
         scaler.transform(df),
         columns=FEATURE_NAMES
     )
-    label_int  = model.predict(df_scaled)[0]
+    label_int = model.predict(df_scaled)[0]
     confidence = model.predict_proba(df_scaled)[0][label_int]
 
     return {
