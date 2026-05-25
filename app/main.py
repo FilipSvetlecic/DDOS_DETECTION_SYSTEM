@@ -1,10 +1,3 @@
-"""
-app/main.py
-
-FastAPI server with a single POST /predict endpoint.
-Clients send flow features, server predicts BENIGN or DDoS.
-"""
-
 import logging
 from fastapi import FastAPI
 from pydantic import BaseModel, field_validator
@@ -47,13 +40,13 @@ def predict_endpoint(flow: FlowFeatures):
 
     if result["label"] == "DDoS":
         log.warning(
-            f"⚠  DDoS detected   confidence={result['confidence']}  "
+            f"!  DDoS detected   confidence={result['confidence']}  "
             f"pkts={flow.total_fwd_packets}  pkts_s={flow.flow_pkts_s:.1f}  "
             f"bytes_s={flow.flow_bytes_s:.1f}  avg_pkt={flow.avg_packet_size:.1f}"
         )
     else:
         log.info(
-            f"✓  BENIGN           confidence={result['confidence']}  "
+            f"+  BENIGN           confidence={result['confidence']}  "
             f"pkts={flow.total_fwd_packets}  pkts_s={flow.flow_pkts_s:.1f}  "
             f"bytes_s={flow.flow_bytes_s:.1f}  avg_pkt={flow.avg_packet_size:.1f}"
         )
